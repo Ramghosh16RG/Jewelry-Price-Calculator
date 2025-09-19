@@ -202,8 +202,8 @@ calcForm.addEventListener("submit",function(e){
     if(diamondPrice>0) output+=`Diamond Price: ₹${diamondPrice.toFixed(2)}\n`;
     output+=`Gold Price (${goldCarat}): ₹${goldPrice.toFixed(2)}\n`;
     output+=`Making Charges: ₹${makingCharges.toFixed(2)}\n`;
-    output+=`Base Cost (Original Price): ₹${baseCost.toFixed(2)}\n`;
-    if(isFriend.value==="no") output+=`Brand Extra (10%): ₹${brandExtra.toFixed(2)}\n`;
+    output+=`Base Cost (Original Cost): ₹${baseCost.toFixed(2)}\n`;
+    if(isFriend.value==="no") output+=`Brand Extra : ₹${brandExtra.toFixed(2)}\n`;
     output+=`Actual Price (before discount): ₹${actualPrice.toFixed(2)}\n`;
     output+=`Discount Applied: ₹${discountAmount.toFixed(2)}\n`;
     output+=`Final Price (after discount): ₹${finalPrice.toFixed(2)}`;
@@ -270,3 +270,4 @@ function exportCSV(){
 </script>
 </body>
 </html>
+
