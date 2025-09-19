@@ -6,7 +6,6 @@
 <title>Luxury Jewelry Price Calculator</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Roboto:wght@400;500&display=swap');
-
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Roboto',sans-serif;}
 body{display:flex;min-height:100vh;background:#1a1a1a;color:#fff;}
 .sidebar{width:250px;background:#111;color:#fff;display:flex;flex-direction:column;padding:20px;box-shadow:2px 0 10px rgba(0,0,0,0.5);}
@@ -44,7 +43,7 @@ button.submit:hover{background:#e0b500;}
 <body>
 
 <div class="sidebar">
-<h2>Jewelry Calculator</h2>
+<h2>SVARNA</h2>
 <button onclick="showPage('calculatorPage')">Calculator</button>
 <button onclick="showPage('historyPage')">History</button>
 </div>
@@ -64,7 +63,6 @@ button.submit:hover{background:#e0b500;}
 <div id="diamondInputs" style="display:none;">
 <label>Diamond Rate (per carat ₹):</label>
 <input type="number" id="diamondRate" step="any">
-
 <label>Diamond Weight (carat):</label>
 <input type="number" id="diamondWeight" step="any">
 </div>
@@ -125,7 +123,7 @@ button.submit:hover{background:#e0b500;}
 <th>Diamond Price</th>
 <th>Gold Price</th>
 <th>Making Charges</th>
-<th>Base Cost</th>
+<th>Base Cost (Original Price)</th>
 <th>Brand Extra</th>
 <th>Actual Price</th>
 <th>Discount Applied</th>
@@ -159,8 +157,7 @@ const historyBody=document.getElementById("historyBody");
 const isFriend=document.getElementById("isFriend");
 
 let history=[];
-const defaultBrandMargin=0.30;
-const wastageBuffer=0.06;
+const brandMargin=0.10; // 10% Brand Extra
 
 hasDiamond.addEventListener("change",()=>{diamondInputs.style.display=hasDiamond.value==="yes"?"block":"none";});
 applyDiscount.addEventListener("change",()=>{discountInputs.style.display=applyDiscount.value==="yes"?"block":"none";});
@@ -168,34 +165,35 @@ applyDiscount.addEventListener("change",()=>{discountInputs.style.display=applyD
 calcForm.addEventListener("submit",function(e){
     e.preventDefault();
     const goldRate24=parseFloat(document.getElementById("goldRate24").value);
-    const goldRates={"24K":goldRate24,"22K":goldRate24*0.916,"18K":goldRate24*0.75,"14K":goldRate24*0.583};
+    const goldRates={"24K":goldRate24,"22K":goldRate24*0.92,"18K":goldRate24*0.75,"14K":goldRate24*0.59};
+    
     let diamondPrice=0;
     if(hasDiamond.value==="yes"){
         const diamondRate=parseFloat(document.getElementById("diamondRate").value);
         const diamondWeight=parseFloat(document.getElementById("diamondWeight").value);
         diamondPrice=diamondRate*diamondWeight;
     }
+
     const goldWeight=parseFloat(document.getElementById("goldWeight").value);
     const goldCarat=document.getElementById("goldCarat").value;
     const goldPrice=goldWeight*goldRates[goldCarat];
+
     const mode=document.getElementById("mode").value;
     let makingCharges=0;
-    if(mode==="B2C"){makingCharges=goldWeight<=10?2000*goldWeight:1500*goldWeight;}
-    else{makingCharges=goldWeight<=10?2000*goldWeight:2500*goldWeight;}
+    if(mode==="B2C"){makingCharges=goldWeight<=10?2500*goldWeight:2000*goldWeight;}
+    else{makingCharges=goldWeight<=10?2000*goldWeight:1500*goldWeight;}
     if(isFriend.value==="yes"){makingCharges=1000*goldWeight;}
+
     let baseCost=diamondPrice+goldPrice+makingCharges;
-
-    // Automatic Brand Extra
     let brandExtra=0;
-    if(isFriend.value==="yes"){brandExtra=0;} 
-    else{brandExtra=baseCost*(wastageBuffer+defaultBrandMargin);}
+    if(isFriend.value==="no"){brandExtra=baseCost*brandMargin;}
 
-    let actualPrice=baseCost+brandExtra;
+    let actualPrice=baseCost+brandExtra; // after Brand Extra
     let discountAmount=0;
     let finalPrice=actualPrice;
     if(applyDiscount.value==="yes"){
         const discountPercent=parseFloat(document.getElementById("discountPercent").value)/100;
-        discountAmount=makingCharges*discountPercent;
+        discountAmount=actualPrice*discountPercent;
         finalPrice-=discountAmount;
     }
 
@@ -204,8 +202,8 @@ calcForm.addEventListener("submit",function(e){
     if(diamondPrice>0) output+=`Diamond Price: ₹${diamondPrice.toFixed(2)}\n`;
     output+=`Gold Price (${goldCarat}): ₹${goldPrice.toFixed(2)}\n`;
     output+=`Making Charges: ₹${makingCharges.toFixed(2)}\n`;
-    output+=`Base Cost: ₹${baseCost.toFixed(2)}\n`;
-    output+=`Brand Extra: ₹${brandExtra.toFixed(2)}\n`;
+    output+=`Base Cost (Original Price): ₹${baseCost.toFixed(2)}\n`;
+    if(isFriend.value==="no") output+=`Brand Extra (10%): ₹${brandExtra.toFixed(2)}\n`;
     output+=`Actual Price (before discount): ₹${actualPrice.toFixed(2)}\n`;
     output+=`Discount Applied: ₹${discountAmount.toFixed(2)}\n`;
     output+=`Final Price (after discount): ₹${finalPrice.toFixed(2)}`;
@@ -213,7 +211,6 @@ calcForm.addEventListener("submit",function(e){
     resultText.textContent=output;
     resultModal.style.display="flex";
 
-    // Add to History
     history.push({
         diamondPrice:diamondPrice.toFixed(2),
         goldPrice:goldPrice.toFixed(2),
@@ -273,4 +270,3 @@ function exportCSV(){
 </script>
 </body>
 </html>
-
